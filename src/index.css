@@ -1,0 +1,838 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   KHAYAL VERSE — DESIGN TOKENS
+   Spider-Verse editorial: near-black ink base, hot magenta, electric cyan,
+   warning yellow. Print-process textures (halftone, misregistration, ink
+   outlines) over a cinematic dark stage.
+   ========================================================================== */
+
+@font-face {
+  font-family: "Bangers";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/bangers-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Patrick Hand SC";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/patrick-hand-sc-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/archivo-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Archivo";
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/archivo-italic-latin.woff2") format("woff2");
+}
+
+@theme {
+  /* stage */
+  --color-ink: #0a090e;
+  --color-ink-soft: #131019;
+  --color-ink-card: #17141f;
+  --color-paper: #f2ecdf;
+  /* print inks */
+  --color-magenta: #ff2e88;
+  --color-magenta-hot: #ff5fa8;
+  --color-cyan-el: #00e5ff;
+  --color-royal: #2f5cff;
+  --color-warning: #ffd60a;
+  /* text */
+  --color-body: #b9b4c4;
+  --color-body-dim: #8d85a0;
+  /* notes on paper surfaces: dark enough for 4.5:1+ on #f2ecdf */
+  --color-note-ink: #4a3d63;
+  --color-note-gold: #6b4d00;
+
+  /* ground marks: the sky's tone lines, rgba() ink-mark channel, and the
+     film's end-cut color that blends the hero into the universe */
+  --sky-ink: rgba(242, 236, 223, 0.35);
+  --sky-ink-faint: rgba(242, 236, 223, 0.055);
+  --mark-rgb: 242, 236, 223;
+  --ground-handoff: #0a090e;
+
+  --font-display: "Bangers", "Arial Narrow", sans-serif;
+  --font-letter: "Patrick Hand SC", "Archivo", system-ui, sans-serif;
+  --font-body: "Archivo", system-ui, sans-serif;
+  --font-note: "Patrick Hand SC", "Archivo", system-ui, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* --------------------------------------------------------------------------
+   BASE
+   -------------------------------------------------------------------------- */
+html {
+  background: var(--color-ink);
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-magenta);
+  color: var(--color-ink);
+}
+
+/* type scale helpers (fluid) */
+/* Bangers: real comic masthead lettering — letterset with a touch of
+   tracking and the letterer's 95% horizontal scale (Blambot canon). */
+.t-display {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  line-height: 0.96;
+  letter-spacing: 0.045em;
+  transform: scaleX(0.97);
+}
+/* .t-letter — the comic letterer voice (Patrick Hand SC): all-caps hand
+   lettering for captions, margin notes, SFX annotations. */
+.t-letter {
+  font-family: var(--font-letter);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+/* .t-note — legacy annotation voice, now Patrick Hand SC (the letterer). */
+.t-note {
+  font-family: var(--font-note);
+  font-style: normal;
+  font-size: 1.06em;
+  letter-spacing: 0.02em;
+}
+.t-body {
+  font-family: var(--font-body);
+}
+
+/* --------------------------------------------------------------------------
+   PRINT TEXTURES
+   -------------------------------------------------------------------------- */
+
+/* halftone dot field, tinted via --dot-color */
+.halftone {
+  background-image: radial-gradient(
+    circle at center,
+    var(--dot-color, rgba(255 255 255 / 0.16)) var(--dot-size, 1.2px),
+    transparent calc(var(--dot-size, 1.2px) + 0.5px)
+  );
+  background-size: var(--dot-gap, 7px) var(--dot-gap, 7px);
+}
+
+/* scanlines for the glitch chapter */
+.scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255 255 255 / 0.05) 0 1px,
+    transparent 1px 3px
+  );
+  mix-blend-mode: overlay;
+}
+
+/* misregistration on box edges: magenta/cyan ghost edges.
+   The ghost plates WOBBLE (line boil): three offset states held at 12fps
+   (0.25s / 3 frames), like ink re-pressed per drawing — the Spider-Verse
+   "living ink" feel. Gate: reduced-motion block below kills it. */
+.misreg {
+  position: relative;
+}
+.misreg::before,
+.misreg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.misreg::before {
+  border: 2px solid rgba(255 46 136 / 0.55);
+  animation: boil-magenta 0.25s steps(1, jump-none) infinite;
+}
+.misreg::after {
+  border: 2px solid rgba(0 229 255 / 0.5);
+  animation: boil-cyan 0.25s steps(1, jump-none) infinite;
+}
+@keyframes boil-magenta {
+  0%   { transform: translate(3px, 3px); }
+  33%  { transform: translate(4.2px, 2.2px) rotate(0.15deg); }
+  66%  { transform: translate(2.2px, 4px) rotate(-0.1deg); }
+  100% { transform: translate(3px, 3px); }
+}
+@keyframes boil-cyan {
+  0%   { transform: translate(-3px, -3px); }
+  33%  { transform: translate(-4px, -2.4px) rotate(-0.12deg); }
+  66%  { transform: translate(-2.4px, -4.2px) rotate(0.14deg); }
+  100% { transform: translate(-3px, -3px); }
+}
+
+/* generic line-boil wobble for ink strokes (borders, scribbles) */
+.boil {
+  animation: boil 0.25s steps(1, jump-none) infinite;
+}
+@keyframes boil {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  33%  { transform: translate(0.9px, -0.7px) rotate(0.2deg); }
+  66%  { transform: translate(-0.8px, 0.9px) rotate(-0.18deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/* crisscross hatch texture: the film's shading lines, next to halftone */
+.hatch {
+  background-image:
+    repeating-linear-gradient(45deg, var(--hatch-color, rgba(242 236 223 / 0.08)) 0 1px, transparent 1px 6px),
+    repeating-linear-gradient(-45deg, var(--hatch-color, rgba(242 236 223 / 0.05)) 0 1px, transparent 1px 7px);
+}
+
+/* chromatic aberration text: layered text-shadows, red/cyan offset */
+.chroma {
+  text-shadow:
+    2px 0 0 rgba(255 46 136 / 0.55),
+    -2px 0 0 rgba(0 229 255 / 0.55);
+}
+.chroma-soft {
+  text-shadow:
+    1px 0 0 rgba(255 46 136 / 0.35),
+    -1px 0 0 rgba(0 229 255 / 0.35);
+}
+
+/* ---------------------------------------------------------------------------
+   CHAPTER BOX — living-panel chrome. The offset magenta/cyan shadow is the
+   "soft shadow shift" on hover: its opacity is --hover-p, which the box's
+   rAF physics writes every frame, so the shadow slides in elastically.
+   ------------------------------------------------------------------------ */
+.chapter-box {
+  position: relative;
+}
+.chapter-box::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  z-index: -1;
+  pointer-events: none;
+  box-shadow:
+    6px 8px 0 rgba(255 46 136 / 0.28),
+    -6px -8px 0 rgba(0 229 255 / 0.22);
+  opacity: var(--hover-p, 0);
+  transition: opacity 0.15s linear;
+}
+.chapter-box:focus-visible {
+  outline: 2px dashed var(--color-warning);
+  outline-offset: 10px;
+}
+
+/* spray gradient text fill */
+.spray-text {
+  background: linear-gradient(
+    92deg,
+    var(--color-magenta) 12%,
+    var(--color-royal) 46%,
+    var(--color-cyan-el) 78%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* spray radial glow used on neon box */
+.spray-glow {
+  background:
+    radial-gradient(closest-side at 22% 24%, rgba(255 46 136 / 0.42), transparent 70%),
+    radial-gradient(closest-side at 82% 76%, rgba(0 229 255 / 0.38), transparent 72%),
+    radial-gradient(closest-side at 60% 96%, rgba(47 92 255 / 0.32), transparent 70%);
+}
+
+/* accent underline swipe for key words; scaleX driven by --accent-draw
+   (set per-frame by the hero's scene transform) so the highlight draws
+   itself as the line reveals */
+.accent-word {
+  position: relative;
+  display: inline-block;
+}
+.accent-word::after {
+  content: "";
+  position: absolute;
+  left: -2%;
+  right: 4%;
+  bottom: 0.08em;
+  height: 0.14em;
+  background: var(--accent-color, var(--color-warning));
+  transform: skewX(-14deg) scaleX(var(--accent-draw, 1));
+  transform-origin: left center;
+  z-index: -1;
+}
+
+/* star twinkle used in the universe: true 12fps "on 2s" crunch —
+   the film held drawings, it didn't tween them */
+@keyframes twinkle {
+  0%   { opacity: var(--tw-min, 0.18); }
+  50%  { opacity: var(--tw-max, 0.9); }
+  100% { opacity: var(--tw-min, 0.18); }
+}
+
+/* ============================================================================
+   COMIC CAPTION SYSTEM — the film's narration format: yellow (or ink)
+   boxes with a top-left notch, condensed type, slight wonky rotation.
+   Used for scene text, kickers, annotations, form labels — site-wide.
+   ========================================================================== */
+
+/* classic caption box: paper fill, ink border, notched corner — set in the
+   letterer's hand (Patrick Hand SC, all-caps), Blambot's balloon padding */
+.caption-box {
+  position: relative;
+  background: var(--cap-bg, #ffd60a);
+  color: var(--cap-ink, #0a090e);
+  padding: 0.55em 0.9em 0.5em 0.75em;
+  font-family: var(--font-letter);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  box-shadow: 4px 4px 0 rgba(10 9 14 / 0.85);
+  transform: rotate(var(--cap-tilt, -1.2deg));
+}
+.caption-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0.62em;
+  height: 0.62em;
+  background: var(--color-ink);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+.caption-box--ink {
+  --cap-bg: #f2ecdf;
+}
+.caption-box--dark {
+  --cap-bg: #17141f;
+  --cap-ink: #f2ecdf;
+  box-shadow: 3px 3px 0 rgba(0 229 255 / 0.35), -2px -2px 0 rgba(255 46 136 / 0.3);
+}
+
+/* speech-bubble tail, for notes that talk */
+.caption-tail::after {
+  content: "";
+  position: absolute;
+  bottom: -9px;
+  left: 22px;
+  width: 14px;
+  height: 10px;
+  background: inherit;
+  clip-path: polygon(0 0, 100% 0, 30% 100%);
+  filter: drop-shadow(2px 2px 0 rgba(10 9 14 / 0.85));
+}
+
+/* ---------------------------------------------------------------------------
+   SLAM-IN — click-response stamp for interactive feedback (form status).
+   Scroll entrances are pure scrub envelopes now (engine/scrub.ts), so this
+   one-shot class remains ONLY for user-action feedback, never for scroll.
+   ------------------------------------------------------------------------ */
+@keyframes slam-in {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--cap-tilt, -1.2deg)) scale(1.65);
+  }
+  70% {
+    opacity: 1;
+    transform: rotate(var(--cap-tilt, -1.2deg)) scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(var(--cap-tilt, -1.2deg)) scale(1);
+  }
+}
+.slam-in {
+  animation: slam-in 0.3s steps(4, jump-none) both;
+}
+
+/* ---------------------------------------------------------------------------
+   THWIP BUTTON — contact/submit buttons. Ink capsule; on hover the label
+   flickers like a web-shot burst; on active it compresses like impact.
+   ------------------------------------------------------------------------ */
+.thwip-btn {
+  position: relative;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  /* literal print furniture — same reasoning as .issue-stamp: the
+     button is paper stock + pen ink on ANY ground */
+  background: #f2ecdf;
+  color: #0a090e;
+  border: 2px solid #0a090e;
+  box-shadow: 4px 4px 0 var(--tw-shadow, var(--color-magenta)), -3px -3px 0 rgba(0 229 255 / 0.5);
+  padding: 0.85em 1.6em 0.75em;
+  transform: rotate(-1.5deg);
+  transition: transform 0.12s var(--ease-spring), box-shadow 0.12s var(--ease-spring);
+  cursor: pointer;
+}
+.thwip-btn:hover {
+  transform: rotate(-1.5deg) scale(1.04);
+  animation: thwip-flicker 0.24s steps(3, jump-none) 1;
+}
+.thwip-btn:active {
+  transform: rotate(-1.5deg) scale(0.92);
+  box-shadow: 1px 1px 0 var(--tw-shadow, var(--color-magenta));
+}
+@keyframes thwip-flicker {
+  0%, 100% { filter: none; }
+  33% { filter: drop-shadow(3px 0 0 rgba(255 46 136 / 0.8)); }
+  66% { filter: drop-shadow(-3px 0 0 rgba(0 229 255 / 0.8)); }
+}
+.thwip-btn--magenta { --tw-shadow: var(--color-magenta); }
+.thwip-btn--cyan { --tw-shadow: var(--color-cyan-el); }
+.thwip-btn--yellow { --tw-shadow: var(--color-warning); }
+
+/* ---------------------------------------------------------------------------
+   INK INPUTS — the letter form's fields. Paper fill (not transparent: typed
+   ink must sit on solid ground), 16px floor (no iOS focus zoom), a clear
+   focused state in the site's ink language: offset shadow + cyan underline.
+   Placeholder is a dim pencil note, ~4.6:1 on the fill.
+   --------------------------------------------------------------------------- */
+.ink-input {
+  width: 100%;
+  border: 2px solid #0a090e;
+  background: #ece5d4;
+  color: #0a090e;
+  font-size: 16px;
+  line-height: 1.45;
+  padding: 0.8em 1em;
+  outline: none;
+  box-shadow: 3px 3px 0 rgba(10 9 14 / 0.55);
+  transition: box-shadow 0.15s var(--ease-spring), transform 0.15s var(--ease-spring);
+}
+.ink-input::placeholder {
+  color: #6b6355;
+}
+.ink-input:hover {
+  box-shadow: 4px 4px 0 rgba(10 9 14 / 0.65);
+}
+.ink-input:focus {
+  box-shadow: 5px 5px 0 var(--color-cyan-el);
+  transform: translate(-2px, -2px);
+}
+.ink-input:focus-visible {
+  outline: 2px dashed var(--color-royal);
+  outline-offset: 3px;
+}
+/* keep ink even when the browser paints autofill */
+.ink-input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #ece5d4 inset;
+  -webkit-text-fill-color: var(--color-ink);
+  caret-color: var(--color-ink);
+}
+
+/* the note's underline scribble — a thin double dash that reads as a
+   hand-drawn stroke without a second typeface */
+.t-note-u {
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.28em;
+}
+
+/* ---------------------------------------------------------------------------
+   WEB-LINE DRAW — dashed ink lines that draw themselves (SVG stroke-dash
+   is handled inline; this variant animates the dash offset like thread)
+   ------------------------------------------------------------------------ */
+@keyframes thread-run {
+  to { stroke-dashoffset: -28; }
+}
+.thread-line {
+  stroke-dasharray: 6 8;
+  animation: thread-run 1.4s linear infinite;
+}
+
+/* paper page: the sketchbook ground for the journey section */
+.paper-page {
+  background:
+    radial-gradient(ellipse at 18% 12%, rgba(255 214 10 / 0.05), transparent 55%),
+    radial-gradient(ellipse at 85% 90%, rgba(47 92 255 / 0.07), transparent 50%),
+    #f2ecdf;
+  color: var(--color-ink);
+}
+.paper-page .halftone {
+  --dot-color: rgba(10 9 14 / 0.14);
+}
+
+/* dimension flicker: multiverse cards' alternate-universe tag */
+@keyframes dim-flicker {
+  0%, 100% { opacity: 1; }
+  8% { opacity: 0.2; }
+  10% { opacity: 1; }
+  54% { opacity: 1; }
+  56% { opacity: 0.35; }
+  58% { opacity: 1; }
+}
+.dim-flicker {
+  animation: dim-flicker 4.2s steps(1, jump-none) infinite;
+}
+
+/* swing: retired — the spider cameo is fully scrub-driven now (Cameos.tsx) */
+
+/* page flash: retired — the THWIP flash is scrub-driven now */
+
+/* ---------------------------------------------------------------------------
+   PANEL ENTRANCES — none exist: all scroll entrances are pure scrub
+   envelopes written by the engine (transform/opacity per frame), so the
+   one-shot CSS entrance classes were deleted. Reversible, no leaks.
+   ------------------------------------------------------------------------ */
+
+/* ink-frame: the comic panel chrome every chapter shares */
+.ink-frame {
+  position: relative;
+  border: 3px solid var(--color-paper);
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+  background: var(--color-ink-card);
+}
+.ink-frame::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px dashed rgba(242 236 223 / 0.25);
+  pointer-events: none;
+}
+
+/* cameo flash/yank on <html>: retired — both moments are scrub-driven
+   overlay elements now (Cameos.tsx), no html-class animation needed. */
+
+/* reduced-motion already global; these respect it via the universal rule */
+
+/* ============================================================================
+   3D COMIC PANEL SYSTEM: true CSS dioramas.
+   Scene → core (preserve-3d) → planes at fixed translateZ depths.
+   Plane ladder (for perspective ~1000px; z never near the perspective):
+     shadow  -50px  the fake drop-shadow plane, reacts to hover via opacity
+     bg      -40px  halftone/tone field + the panel's art marks
+     content   0px  type + CTA — the plane that moves least (crisp text)
+     pop    +20px  sticker emblem
+     sfx    +50px  the SFX word breaking the border (the frame-break moment)
+   HOVER: the rAF loop tilts the CORE (rotateX/rotateY ±10-12°, spring);
+   the planes' parallax comes free from the projection — nothing per-plane
+   is animated, so it stays compositor-cheap.
+   FLATTEN GUARD (MDN/Atropos pitfalls): no overflow/filters/clip-path on
+   the 3D chain. Overflow is applied on an inner clip element instead.
+   ========================================================================== */
+
+.scene {
+  perspective: 1000px;
+  perspective-origin: 50% 46%;
+}
+
+.panel3d {
+  position: relative;
+  transform-style: preserve-3d;
+  width: min(84vw, 22rem);
+}
+
+/* the plane primitives */
+.p3d {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+.p3d--shadow {
+  transform: translateZ(-50px) scale(1.04);
+  /* pre-softened radial gradient: reads as a soft shadow WITHOUT a blur
+     filter — zero paint, pure compositing (the old blur was per-frame cost) */
+  background: radial-gradient(
+    closest-side,
+    rgba(10 9 14 / 0.6),
+    rgba(10 9 14 / 0.28) 62%,
+    transparent 100%
+  );
+  opacity: var(--shadow-p, 0.55);
+  transition: opacity 0.25s linear;
+}
+.p3d--bg {
+  transform: translateZ(-40px);
+  background: var(--panel-bg, #17141f);
+  border: 3px solid var(--panel-edge, #f2ecdf);
+  box-shadow: inset 0 0 0 2px var(--color-ink);
+}
+.p3d--content {
+  transform: translateZ(0);
+  position: relative; /* in-flow content: this plane holds the box's size */
+  pointer-events: auto;
+}
+.p3d--pop {
+  transform: translateZ(20px);
+}
+.p3d--sfx {
+  transform: translateZ(50px);
+}
+
+/* page-flip tick for the nav's comic page counter: a tiny on-2s corner
+   flip, like turning a page — snap, not tween */
+@keyframes page-flip {
+  0% {
+    transform: rotate(var(--sticker-rot, -7deg)) scale(1);
+  }
+  40% {
+    transform: rotate(calc(var(--sticker-rot, -7deg) + 4deg)) scale(1.14);
+  }
+  100% {
+    transform: rotate(var(--sticker-rot, -7deg)) scale(1);
+  }
+}
+.page-flip {
+  animation: page-flip 0.24s steps(3, jump-none) 1;
+}
+
+/* ----------------------------------------------------------------------------
+   SCROLL-TOP: the TOP stamp's web ride. Squash-and-stretch the
+   film would be proud of: stamp compresses on the yank, stretches thin
+   as it flies up its line, gone off the top. */
+@keyframes top-ride {
+  0% {
+    transform: translateY(0) scale(1, 1);
+  }
+  12% {
+    /* the THWIP squash — the pull takes hold */
+    transform: translateY(4px) scale(1.18, 0.72);
+  }
+  55% {
+    /* stretched thin mid-flight, slight arc */
+    transform: translateY(-46vh) scale(0.72, 1.3) rotate(-6deg);
+  }
+  100% {
+    transform: translateY(-110vh) scale(0.9, 1.1) rotate(-10deg);
+  }
+}
+/* the THWIP word stamps on over the stamp as it fires */
+@keyframes top-thwip {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 6px) rotate(4deg) scale(0.6);
+  }
+  25% {
+    opacity: 1;
+    transform: translate(-50%, 0) rotate(-4deg) scale(1.12);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(-50%, -10px) rotate(-4deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -30px) rotate(-4deg) scale(0.9);
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   WEB-JUMP: the nav's page numbers throw a web at the target
+   section. The thrown strand: a two-segment zig (up) zag (to target)
+   with a sag in the middle, stroke-dash-drawn from the nav chip. */
+@keyframes web-throw-fade {
+  0% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+/* the target card gets CAUGHT: a spring yank toward the strand's anchor,
+   then settles — the catch, played as a hard-comic two-step */
+@keyframes web-catch {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  35% {
+    transform: translate(-10px, -14px) rotate(-2.4deg);
+  }
+  70% {
+    transform: translate(4px, 5px) rotate(1.2deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+/* the whole page leans toward the strand's pull while Lenis glides —
+   a tug you feel in your wrist, on 2s */
+@keyframes web-page-tug {
+  0% {
+    transform: translate(0, 0);
+  }
+  30% {
+    transform: translate(var(--tug-x, 0px), -6px);
+  }
+  60% {
+    transform: translate(calc(var(--tug-x, 0px) * -0.25), 2px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   NAV WEB-JUMP CHIPS: small issue stamps; the act you're IN
+   fills yellow. Hover: straighten + pop, the press is a squash. */
+.nav-chip {
+  transition: transform 0.12s steps(2), background-color 0.12s steps(2);
+}
+.nav-chip:hover {
+  transform: rotate(0deg) scale(1.12);
+}
+.nav-chip:active {
+  transform: scale(0.86);
+}
+.nav-chip:focus-visible {
+  outline: 2px dashed var(--color-warning);
+  outline-offset: 3px;
+}
+.nav-chip--on,
+.nav-chip--on:hover {
+  background: var(--color-warning);
+  transform: rotate(0deg);
+}
+
+/* keyboard focus rings for the remaining interactive print furniture
+   (thwip buttons, stamps-as-buttons) — same dashed-warning language */
+.thwip-btn:focus-visible,
+.issue-stamp:focus-visible {
+  outline: 2px dashed var(--color-warning);
+  outline-offset: 3px;
+}
+
+/* ----------------------------------------------------------------------------
+   POSITIONING OVERRIDES for the comic furniture. Tailwind 4 puts
+   its utilities inside @layer utilities; our .issue-stamp is unlayered,
+   which BEATS layered styles in the cascade — so `fixed`/`relative`
+   utilities on stamps/chips silently lose to the stamp's absolute +
+   corner offsets. Ship the needed positions unlayered, appended so they
+   win over the stamp's own rule, INCLUDING the corner offsets: fixed
+   stamps take bottom/right from utilities, flow stamps sit at 0. */
+.issue-stamp.fixed {
+  position: fixed;
+  top: auto;
+  left: auto;
+}
+.issue-stamp.relative {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+.issue-stamp.static {
+  position: static;
+}
+
+
+
+/* diorama focus ring (button variants share the chapter-box outline) */
+.diorama:focus-visible {
+  outline: 2px dashed var(--color-warning);
+  outline-offset: 10px;
+}
+
+/* the SFX word: Bangers burst with CMYK ghost plates, breaks the frame */
+.sfx-word {
+  position: absolute;
+  top: -0.9em;
+  right: -0.5em;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+  letter-spacing: 0.05em;
+  color: var(--color-warning);
+  text-shadow:
+    3px 0 0 rgba(255 46 136 / 0.85),
+    -3px 0 0 rgba(0 229 255 / 0.85);
+  -webkit-text-stroke: 1px var(--color-ink);
+  rotate: 8deg;
+  white-space: nowrap;
+}
+
+/* the sticker emblem: a wonky star-burst chip */
+.sticker {
+  position: absolute;
+  padding: 0.4em 0.7em 0.32em;
+  font-family: var(--font-letter);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  border: 2px solid var(--color-ink);
+  box-shadow: 3px 3px 0 rgba(10 9 14 / 0.8);
+  rotate: var(--sticker-rot, 6deg);
+  white-space: nowrap;
+}
+.sticker--cyan { background: var(--color-cyan-el); }
+.sticker--magenta { background: var(--color-magenta); color: var(--color-ink); }
+.sticker--yellow { background: var(--color-warning); }
+
+/* corner "issue stamp" parody — authentic comics page furniture */
+.issue-stamp {
+  position: absolute;
+  top: -14px;
+  left: -14px;
+  padding: 0.25em 0.5em;
+  font-family: var(--font-letter);
+  font-size: 0.66rem;
+  background: #f2ecdf;
+  color: #0a090e;
+  border: 2px solid #0a090e;
+  border-radius: 999px;
+  box-shadow: 2px 2px 0 rgba(10 9 14 / 0.8);
+  rotate: -7deg;
+}
+
+/* --------------------------------------------------------------------------
+   REDUCED MOTION
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .misreg::before,
+  .misreg::after,
+  .boil {
+    animation: none !important;
+    transform: translate(3px, 3px); /* static misregistration remains */
+  }
+  .misreg::after {
+    transform: translate(-3px, -3px) !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
