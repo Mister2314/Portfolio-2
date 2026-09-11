@@ -26,9 +26,36 @@ export function CinematicHero() {
   const endRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLDivElement>(null);
 
-  const [src] = useState(() =>
-    isMobileDevice() && VIDEO.mobile ? VIDEO.mobile : VIDEO.desktop
+  const [mobile] = useState(() => isMobileDevice());
+  // mobile starts with NO source at all: the clip is fetched whole as a
+  // local blob first (see the fetch effect below) and only then does the
+  // video get a src. Cellular Safari ignores preload="auto" and serves
+  // remote scrub-seek ranges from the network — freeze, stall, freeze.
+  // The poster holds the first frame until the swap, and the scrubber
+  // has no duration to seek into until then, so nothing moves early.
+  const [src, setSrc] = useState<string>(() =>
+    mobile && VIDEO.mobile ? "" : VIDEO.desktop
   );
+
+  useEffect(() => {
+    if (src !== "" || !VIDEO.mobile) return;
+    let dead = false;
+    fetch(VIDEO.mobile)
+      .then((r) => {
+        if (!r.ok) throw new Error(String(r.status));
+        return r.blob();
+      })
+      .then((b) => {
+        if (!dead) setSrc(URL.createObjectURL(b));
+      })
+      .catch(() => {
+        // blob fetch failed (offline etc.) — plain streaming beats no film
+        if (!dead) setSrc(VIDEO.mobile);
+      });
+    return () => {
+      dead = true;
+    };
+  }, [src]);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -36,11 +63,40 @@ export function CinematicHero() {
     if (!wrap || !video) return;
 
     const reduced = scrollEngine.reducedMotion;
-    const scrubber = new VideoScrubber(video);
+    const scrubber = new VideoScrubber(video, { coarse: mobile });
 
-    const onMeta = () => scrubber.start();
+    // iOS primer: a never-played <video> often refuses to paint seeked
+    // frames at all. One muted play→pause wakes the decode pipeline —
+    // playsInline makes it gesture-free, and it lands back on the first
+    // frame, so the film still never autoplays. If the browser blocks
+    // even that (low power mode), the first touch retries.
+    let primed = !mobile;
+    const prime = () => {
+      if (primed) return;
+      primed = true;
+      video.muted = true;
+      video.play().then(
+        () => video.pause(),
+        () => {
+          primed = false; // blocked: a later touch gets one more shot
+        }
+      );
+    };
+
+    const onMeta = () => {
+      if (!mobile) {
+        scrubber.start();
+        return;
+      }
+      prime();
+      if (video.readyState >= 2) scrubber.start();
+      else video.addEventListener("loadeddata", () => scrubber.start(), { once: true });
+    };
     video.addEventListener("loadedmetadata", onMeta, { once: true });
-    if (video.readyState >= 1) scrubber.start();
+    if (video.readyState >= 1) onMeta();
+
+    const onFirstTouch = () => prime();
+    if (mobile) window.addEventListener("touchstart", onFirstTouch, { once: true, passive: true });
 
     let lastTracking = -1; // letterSpacing cache: only write on real change
 
@@ -137,11 +193,12 @@ export function CinematicHero() {
 
     scrollEngine.registerTrack("hero", { el: wrap, onUpdate: update });
     return () => {
+      window.removeEventListener("touchstart", onFirstTouch);
       scrollEngine.unregisterTrack("hero");
       scrubber.stop();
       video.removeEventListener("loadedmetadata", onMeta);
     };
-  }, [src]);
+  }, [mobile, src]);
 
   return (
     <div
@@ -151,19 +208,18 @@ export function CinematicHero() {
       style={{ height: `${isMobileDevice() ? 380 : 460}vh` }}
     >
       <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
-        {/* video layer */}
+        {/* video layer — no src on mobile until the local blob lands */}
         <video
           ref={videoRef}
           className="absolute inset-0 h-full w-full object-cover"
+          src={src || undefined}
           muted
           playsInline
-          preload="auto"
+          preload={src ? "auto" : "none"}
           poster={VIDEO.poster}
           disablePictureInPicture
           aria-hidden="true"
-        >
-          <source src={src} type="video/mp4" />
-        </video>
+        />
 
         {/* print grain */}
         <div
