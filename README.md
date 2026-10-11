@@ -45,3 +45,15 @@ npm run preview
   with the letter prefilled.
 
 — [Khayal](https://t.me/morpheus2314)
+
+---
+
+## Screenshots
+
+| Desktop | Mobile |
+| :---: | :---: |
+| <img src="docs/preview.png" alt="Desktop view"> | <img src="docs/preview-mobile.png" alt="Mobile view" width="230"> |
+
+<p align="center">
+  <a href="https://portfolio-2-inky-ten.vercel.app">Live site → https://portfolio-2-inky-ten.vercel.app</a>
+</p>
