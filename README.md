@@ -1,4 +1,12 @@
-# KHAYAL VERSE
+<h1 align="center">KHAYAL VERSE</h1>
+
+<p align="center">
+  <a href="https://portfolio-2-inky-ten.vercel.app">
+    <img src="docs/demo.gif" alt="KHAYAL VERSE — animated demo" width="88%">
+  </a>
+</p>
+
+<p align="center"><sub>Live capture of the real build — 2122 KB, loops forever.</sub></p>
 
 My portfolio, built as a one-page cinematic scroll story in Spider-Verse ink.
 
@@ -48,6 +56,17 @@ npm run preview
 
 ---
 
+## Architecture
+
+```mermaid
+flowchart LR
+  W["scroll"] --> E["src/engine/scroll.ts<br/>master rAF loop"]
+  E --> S["scrub.ts<br/>video scrubbing"]
+  E --> P["spring.ts<br/>physics"]
+  E --> V["videoScrubber.ts<br/>frame seeks"]
+  S --> C["Chapter panels<br/>comic spreads"]
+```
+
 ## Screenshots
 
 | Desktop | Mobile |
@@ -55,5 +74,5 @@ npm run preview
 | <img src="docs/preview.png" alt="Desktop view"> | <img src="docs/preview-mobile.png" alt="Mobile view" width="230"> |
 
 <p align="center">
-  <a href="https://portfolio-2-inky-ten.vercel.app">Live site → https://portfolio-2-inky-ten.vercel.app</a>
+  <a href="https://portfolio-2-inky-ten.vercel.app"><b>Live site →</b></a>
 </p>
