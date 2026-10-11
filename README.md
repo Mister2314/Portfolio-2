@@ -73,6 +73,42 @@ flowchart LR
 | :---: | :---: |
 | <img src="docs/preview.png" alt="Desktop view"> | <img src="docs/preview-mobile.png" alt="Mobile view" width="230"> |
 
+## FAQ
+
+<details>
+<summary><b>How does the scroll scrub the hero video?</b></summary>
+
+One master `requestAnimationFrame` loop in `src/engine/scroll.ts` reads the scroll offset and writes it to the video's `currentTime`. Nothing autoplays — the wheel is the playhead, and it works in both directions.
+
+</details>
+
+<details>
+<summary><b>Why a single-file production build?</b></summary>
+
+`vite-plugin-singlefile` inlines everything into one HTML file. It deploys anywhere, loads in one request, and there is no asset-path problem on a static host.
+
+</details>
+
+<details>
+<summary><b>Where do I edit the copy?</b></summary>
+
+`src/content/story.ts`. Every visible word on the site is a constant in that one file, which means the text can change without touching a component.
+
+</details>
+
+<details>
+<summary><b>Why is the animation transform-only?</b></summary>
+
+Animating `transform` and `opacity` stays on the compositor. Animating `width`, `top` or `margin` forces layout on every frame — that is the difference between 60 fps and a stutter.
+
+</details>
+
+## Roadmap
+
+- [ ] Add a reduced-motion fallback for the scrub
+- [ ] Lazy-load the frame assets for the lower chapters
+- [ ] Add an OG image per chapter
+
 <p align="center">
   <a href="https://portfolio-2-inky-ten.vercel.app"><b>Live site →</b></a>
 </p>
