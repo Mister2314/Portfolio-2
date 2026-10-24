@@ -10,6 +10,7 @@
 import { Fragment, useState, type FormEvent } from "react";
 import { useEffect, useRef } from "react";
 import { scrollEngine, clamp01, rangeMap } from "../engine/scroll";
+import { GhostNumeral } from "./GhostNumeral";
 import { arrive, smooth } from "../engine/scrub";
 import {
   CONTACT_ENDPOINT, CONTACT_MAILTO,
@@ -100,6 +101,7 @@ export function Contact() {
       style={{ minHeight: "110vh" }}
       aria-label="contact"
     >
+      <GhostNumeral sectionId="contact" label="05" side="left" />
       {/* ground */}
       <div
         className="halftone absolute inset-0 opacity-30"

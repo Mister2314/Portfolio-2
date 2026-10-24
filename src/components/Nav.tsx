@@ -105,6 +105,7 @@ export function Nav() {
               ref={(el) => {
                 chipsRef.current[i] = el;
               }}
+              data-nav-chip
               type="button"
               onClick={(e) => jumpTo(pg.id, e.currentTarget)}
               aria-label={ARIA_JUMP.replace("{p}", pg.label)}

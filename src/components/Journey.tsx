@@ -10,6 +10,7 @@
 
 import { Fragment, useEffect, useRef } from "react";
 import { scrollEngine } from "../engine/scroll";
+import { GhostNumeral } from "./GhostNumeral";
 import { arrive, smooth } from "../engine/scrub";
 import { DioramaBox } from "./DioramaBox";
 import {
@@ -67,6 +68,7 @@ export function Journey() {
       style={{ minHeight: "150vh" }}
       aria-label={JOURNEY_TITLE}
     >
+      <GhostNumeral sectionId="journey" label="03" side="left" />
       {/* paper grain — kept OFF the text panels themselves */}
       <div
         className="halftone absolute inset-0 opacity-40"

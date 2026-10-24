@@ -11,6 +11,7 @@ import { Fragment, useEffect, useRef } from "react";
 import { scrollEngine } from "../engine/scroll";
 import { arrive, smooth } from "../engine/scrub";
 import { DioramaBox } from "./DioramaBox";
+import { GhostNumeral } from "./GhostNumeral";
 import {
   MULTIVERSE_TITLE, MULTIVERSE_NOTE, MULTIVERSE_ANNOTATION,
   VARIANTS, CANON_WORD, VARIANT_NO_WORD,
@@ -75,6 +76,7 @@ export function Multiverse() {
       className="relative overflow-x-clip"
       aria-label={MULTIVERSE_TITLE}
     >
+      <GhostNumeral sectionId="multiverse" label="04" side="right" />
       {/* dark sky returns for the multiverse */}
       <div
         className="halftone absolute inset-0 opacity-20"

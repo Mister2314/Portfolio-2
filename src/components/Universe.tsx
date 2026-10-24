@@ -15,6 +15,7 @@ import { Fragment, useEffect, useRef } from "react";
 import { scrollEngine, rangeMap, isMobileDevice } from "../engine/scroll";
 import { arrive, smooth } from "../engine/scrub";
 import { ChapterBox } from "./ChapterBox";
+import { GhostNumeral } from "./GhostNumeral";
 import {
   UNIVERSE_TITLE, UNIVERSE_NOTE, UNIVERSE_ANNOTATION, CHAPTERS,
 } from "../content/story";
@@ -146,7 +147,9 @@ export function Universe({ onOpen }: { onOpen: (ch: Chapter, rect: DOMRect) => v
       className="relative overflow-x-clip"
       style={{ minHeight: "160vh" }}
       aria-label={UNIVERSE_TITLE}
+      tabIndex={-1}
     >
+      <GhostNumeral sectionId="universe" label="02" side="right" />
       {/* the sky: pre-softened gradients + cheap twinkling dots */}
       <div ref={skyRef} className="pointer-events-none absolute inset-[-10%] overflow-hidden">
         <div className="spray-glow absolute inset-0 opacity-40" />

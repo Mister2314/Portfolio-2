@@ -38,7 +38,12 @@ React 19 · TypeScript · Vite 7 · Tailwind CSS 4 · Lenis
 - Spring physics and scrub math isolated in `src/engine/`
 - All copy centralized in `src/content/story.ts` — components never hardcode text
 - Single-file production build via `vite-plugin-singlefile`
-- `prefers-reduced-motion` respected globally
+- `prefers-reduced-motion` respected globally (CSS + GSAP-free engine)
+- Keyboard shortcuts: `1–5` throw webs to pages, `T` to top, `Esc` closes overlays
+- Film-leader progress bar (top 3px, GPU-only `scaleX`)
+- Ghost numerals (02–05, kinetic type-as-imagery, 5% opacity, parallax on scroll)
+- View Transitions API overlay open/close (progressive; FLIP stays primary)
+- Focus trap + skip link + press/hover micro-contract (0.97 scale, 0.35s underline sweep)
 
 ## Run locally
 
