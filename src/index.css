@@ -907,6 +907,52 @@ body {
   background-size: 100% 2px;
 }
 
+/* ---- GHOST NUMERAL — printed issue folio, not an opacity trick.
+   The numeral is set as three print plates: a solid magenta plate and a
+   cyan plate slightly out of register, with the paper halftone knocked
+   back through the glyph itself (background-clip:text). Reads as a
+   mis-registered page number under the ink, not as faded text. ---- */
+.ghost-numeral {
+  color: transparent;
+  background-image: radial-gradient(
+    circle at center,
+    rgba(242 236 223 / 0.38) 1.3px,
+    transparent 1.8px
+  );
+  background-size: 7px 7px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow:
+    6px 3px 0 rgba(255 46 136 / 0.09),
+    -6px -3px 0 rgba(0 229 255 / 0.08);
+  rotate: -3deg;
+}
+@media (forced-colors: active) {
+  .ghost-numeral {
+    color: CanvasText;
+    background: none;
+    text-shadow: none;
+  }
+}
+
+/* ---- FILM LEADER — the progress strip as real film furniture: a pale
+   baseline rail, ink fill punched with sprocket perforations, and a
+   paper head edge where the ink arrives (the "frame line"). ---- */
+.film-leader-track {
+  background: rgba(242 236 223 / 0.07);
+  box-shadow: inset 0 -1px 0 rgba(242 236 223 / 0.16);
+}
+.film-leader-fill {
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 9px,
+      rgba(10 9 14 / 0.85) 9px 12px
+    ),
+    linear-gradient(var(--color-magenta-hot), var(--color-magenta));
+  box-shadow: 1px 0 0 rgba(242 236 223 / 0.5);
+}
+
 /* ---- View Transitions layer (progressive: FLIP stays primary) ---- */
 ::view-transition-old(root),
 ::view-transition-new(root) {

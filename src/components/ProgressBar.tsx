@@ -1,6 +1,8 @@
 // ============================================================================
-// PROGRESS BAR — the film leader. A 3px fixed strip along the very top that
-// fills with magenta ink as the comic is read. Rides the scroll engine's
+// PROGRESS BAR — the film leader. A 4px fixed strip along the very top:
+// a pale rail, and a magenta ink fill punched with sprocket perforations
+// (.film-leader-fill), closing on a paper head edge — real film-leader
+// furniture, not a bare colored strip. Rides the scroll engine's
 // existing subscription (no new listeners, no layout reads): one scaleX
 // write per scroll frame, GPU-only. Under reduced motion it still works —
 // it is information, not decoration — but writes are throttled to whole
@@ -43,13 +45,13 @@ export function ProgressBar() {
   return (
     <div
       ref={barRef}
-      className="pointer-events-none fixed inset-x-0 z-[60]"
-      style={{ top: "env(safe-area-inset-top, 0px)", height: 3, background: "rgba(242,236,223,0.08)" }}
+      style={{ top: "env(safe-area-inset-top, 0px)", height: 4 }}
+      className="film-leader-track pointer-events-none fixed inset-x-0 z-[60]"
       aria-hidden="true"
     >
       <div
         ref={fillRef}
-        className="h-full w-full origin-left bg-magenta"
+        className="film-leader-fill h-full w-full origin-left"
         style={{ transform: "scaleX(0)", willChange: "transform" }}
       />
     </div>

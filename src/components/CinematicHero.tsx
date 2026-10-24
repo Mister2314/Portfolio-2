@@ -228,7 +228,7 @@ export function CinematicHero() {
         />
         <div ref={scrimRef} className="pointer-events-none absolute inset-0 bg-ink" style={{ opacity: 0.2 }} />
         {/* the final handoff: the last frames scrims into the ink ground,
-            so the film cuts seamlessly into the universe (no hard cut) */}
+            so the film cuts clean into the universe (no hard cut) */}
         <div
           ref={handoffRef}
           className="pointer-events-none absolute inset-0"
