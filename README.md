@@ -1,114 +1,37 @@
-<h1 align="center">KHAYAL VERSE</h1>
+# Portfolio-2
+
+"Khayal Verse" — my one-page cinematic portfolio in Spider-Verse comic style, where the scroll wheel scrubs a hero video and drives one continuous comic world.
+
+**Live demo:** <https://portfolio-2-inky-ten.vercel.app>
 
 <p align="center">
-  <a href="https://portfolio-2-inky-ten.vercel.app">
-    <img src="docs/demo.gif" alt="KHAYAL VERSE — animated demo" width="88%">
-  </a>
+  <img src="docs/preview.png" alt="Khayal Verse preview" width="360">
 </p>
 
-<p align="center"><sub>Live capture of the real build — 2122 KB, loops forever.</sub></p>
+## What it does
 
-My portfolio, built as a one-page cinematic scroll story in Spider-Verse ink.
+The scroll is the playhead: a master `requestAnimationFrame` loop in `src/engine/scroll.ts` reads the scroll offset and writes it to the hero video's `currentTime`, so the wheel scrubs the footage in both directions and nothing autoplays. Below the hero, four chapter panels expand into full comic spreads, followed by a sketchbook journey, skill variants and a contact letter. Every visible word lives in `src/content/story.ts` as one constant per line.
 
-The scroll **is** the film: the wheel scrubs a pinned, muted video (never
-autoplays, both directions), then drops you into one continuous comic world —
-four chapter panels that expand into full issue spreads, a sketchbook journey,
-skill variants from the multiverse, and a comic letter you can actually send.
+## Tech stack
 
-## Stack
+React 19 · TypeScript · Vite 7 · Tailwind CSS 4 · Lenis
 
-- React 19 + TypeScript + Vite 7 (single-file production build)
-- Tailwind CSS 4 via `@tailwindcss/vite`
-- Lenis smooth scroll — one master rAF, transform/opacity only
-- Self-hosted fonts: Bangers, Patrick Hand SC, Archivo
+## Features
 
-## Run it
+- Scroll-scrubbed hero video (dense-keyframe encoding, both directions, never autoplays)
+- One master rAF loop; only `transform`/`opacity` animate to hold 60 fps
+- Spring physics and scrub math isolated in `src/engine/`
+- All copy centralized in `src/content/story.ts` — components never hardcode text
+- Single-file production build via `vite-plugin-singlefile`
+- `prefers-reduced-motion` respected globally
 
-```
+## Run locally
+
+```bash
+git clone https://github.com/Mister2314/Portfolio-2.git
+cd Portfolio-2
 npm install
-npm run dev      # dev server
-npm run build    # production build → dist/
-npm run preview
+npm run dev
 ```
 
-## Where things live
-
-- `src/content/story.ts` — **every visible word on the site**, one
-  `[EDIT ME]` constant per line. Change copy there, never in components.
-- `src/engine/` — scroll store, scrub math, spring physics, video scrubber.
-- `src/components/` — the film, the universe, journey, multiverse, contact,
-  nav chrome and the surprise cameos.
-- `public/` — fonts + hero video (encoded with dense keyframes so it scrubs
-  smoothly).
-- `PLAN.md` — my working checklist: design tokens, motion rules, media notes.
-
-## Notes
-
-- 60fps contract: read-then-write every frame, offscreen work parks,
-  nothing animates but transform/opacity.
-- `prefers-reduced-motion` respected globally — the scrub stays (it's your
-  input), decorations go static.
-- The contact form has no backend yet: set `CONTACT_ENDPOINT` in `story.ts`
-  (e.g. a Formspree endpoint); until then it opens the visitor's mail app
-  with the letter prefilled.
-
-— [Khayal](https://t.me/morpheus2314)
-
----
-
-## Architecture
-
-```mermaid
-flowchart LR
-  W["scroll"] --> E["src/engine/scroll.ts<br/>master rAF loop"]
-  E --> S["scrub.ts<br/>video scrubbing"]
-  E --> P["spring.ts<br/>physics"]
-  E --> V["videoScrubber.ts<br/>frame seeks"]
-  S --> C["Chapter panels<br/>comic spreads"]
-```
-
-## Screenshots
-
-| Desktop | Mobile |
-| :---: | :---: |
-| <img src="docs/preview.png" alt="Desktop view"> | <img src="docs/preview-mobile.png" alt="Mobile view" width="230"> |
-
-## FAQ
-
-<details>
-<summary><b>How does the scroll scrub the hero video?</b></summary>
-
-One master `requestAnimationFrame` loop in `src/engine/scroll.ts` reads the scroll offset and writes it to the video's `currentTime`. Nothing autoplays — the wheel is the playhead, and it works in both directions.
-
-</details>
-
-<details>
-<summary><b>Why a single-file production build?</b></summary>
-
-`vite-plugin-singlefile` inlines everything into one HTML file. It deploys anywhere, loads in one request, and there is no asset-path problem on a static host.
-
-</details>
-
-<details>
-<summary><b>Where do I edit the copy?</b></summary>
-
-`src/content/story.ts`. Every visible word on the site is a constant in that one file, which means the text can change without touching a component.
-
-</details>
-
-<details>
-<summary><b>Why is the animation transform-only?</b></summary>
-
-Animating `transform` and `opacity` stays on the compositor. Animating `width`, `top` or `margin` forces layout on every frame — that is the difference between 60 fps and a stutter.
-
-</details>
-
-## Roadmap
-
-- [ ] Add a reduced-motion fallback for the scrub
-- [ ] Lazy-load the frame assets for the lower chapters
-- [ ] Add an OG image per chapter
-
-<p align="center">
-  <a href="https://portfolio-2-inky-ten.vercel.app"><b>Live site →</b></a>
-</p>
+Limitation: the contact form has no backend yet — it opens the visitor's mail app with the letter prefilled until `CONTACT_ENDPOINT` is set in `story.ts`.
