@@ -835,4 +835,81 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  /* the View Transitions layer is motion too */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   REVAMP — THE COLLECTED ISSUE (2026-10-24)
+   Craft pass: skip link, micro-interaction contract, underline sweep,
+   View Transitions layer, motion tokens. No new dependencies.
+   ========================================================================== */
+
+/* ---- motion tokens ---- */
+:root {
+  --dur-micro: 180ms;
+  --dur-hover: 380ms;
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---- skip link: invisible until focused, then a loud stamp ---- */
+#universe:focus {
+  outline: none;
+}
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 100;
+  padding: 0.55em 1em;
+  font-family: var(--font-letter);
+  font-size: 0.85rem;
+  background: var(--color-warning);
+  color: var(--color-ink);
+  border: 2px solid var(--color-ink);
+  border-radius: 999px;
+  transform: translateY(-220%);
+  transition: transform var(--dur-hover) var(--ease-expo);
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: none;
+}
+
+/* ---- micro-interaction contract: every press answers, 0.15–0.2s ---- */
+.thwip-btn,
+.nav-chip,
+.issue-stamp {
+  transition: transform var(--dur-micro) var(--ease-expo);
+}
+.thwip-btn:active,
+.nav-chip:active,
+.issue-stamp:active {
+  transform: scale(0.97);
+}
+
+/* ---- underline sweep for the contact/social links ---- */
+.thwip-btn {
+  background-image: linear-gradient(var(--color-ink), var(--color-ink));
+  background-repeat: no-repeat;
+  background-size: 0% 2px;
+  background-position: 0 100%;
+  transition:
+    transform var(--dur-micro) var(--ease-expo),
+    background-size var(--dur-hover) var(--ease-expo);
+}
+.thwip-btn:hover {
+  background-size: 100% 2px;
+}
+
+/* ---- View Transitions layer (progressive: FLIP stays primary) ---- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 280ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
